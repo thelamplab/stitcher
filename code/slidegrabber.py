@@ -81,7 +81,7 @@ def frame_grabs(vidfile, thresh, scale, saveas, folderloc):
             if i != 0 and i % 100 == 0:
                 thisChange = np.corrcoef(np.vstack((arr.flat, lastarr.flat)))[0,1]
                 changes.append(1-thisChange)
-                if thisChange < thresh:
+                if thisChange < thresh or np.std(arr) < .01:
                     count += 1
                     print('found change on frame {}, change # {}, dissimilarity: {}'.format(i, count, np.around(1-thisChange,2)))
                     if saveas == 'pic':
@@ -96,9 +96,9 @@ def frame_grabs(vidfile, thresh, scale, saveas, folderloc):
                     else:
                         pass
                 lastarr = np.copy(arr)
-            i += 1
         except:
             pass
+        i += 1
     fps = int(i)/int(duration)
     return np.array(changes), duration, fps, finish_time, i, frame_stem
 
@@ -114,6 +114,7 @@ changes, dur, fps, fin, frames, frame_stem = frame_grabs(vid, pixThresh, scaleFa
 np.save('{}/{}_pixelchange.npy'.format(outFolder, frame_stem), np.array(changes))
 with open('{}/{}_meta.txt'.format(outFolder, frame_stem), 'w') as metafile:
     metafile.write('{} {} {} {}'.format(dur, fps, fin, frames))
+print('finished')
                       
 
 
