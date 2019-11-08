@@ -19,20 +19,21 @@ scaleFactor = 0.5  # factor by which to reduce image size, eventually aim to mak
 def strip_bands(arr):
     lspan = True
     rspan = True
-    maxx = arr.shape[1]
-    for i in range(1,200):
+    for i in range(1,400):
         if lspan:
             left = arr[:,:i]
             lavg = np.mean(left)
-            if lavg > 0.1:
+            if lavg > 10:
                 start = i
                 lspan = False
         if rspan and i > 1:
             right = arr[:,-i:-1]
             ravg = np.mean(right)
-            if ravg > 0.1:
+            if ravg > 10:
                 stop = arr.shape[1] - i
-                rspan = False   
+                rspan = False  
+    stop = arr.shape[1]-1 if rspan else stop
+    start = 0 if lspan else start
     return start, stop
     
 
@@ -75,6 +76,7 @@ def frame_grabs(vidfile, thresh, scale, saveas, folderloc):
     count = 0
     i = 0
     success = True
+    plot = True
     while success:
         success,arr = vidcap.read()
         try:
@@ -99,6 +101,7 @@ def frame_grabs(vidfile, thresh, scale, saveas, folderloc):
         except:
             pass
         i += 1
+        
     fps = int(i)/int(duration)
     return np.array(changes), duration, fps, finish_time, i, frame_stem
 
